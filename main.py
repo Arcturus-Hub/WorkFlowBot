@@ -455,10 +455,10 @@ async def sync(ctx):
   await ctx.send(f"Synced {len(synced)} commands into the guild")
 
 
+if (len(sys.argv) > 1 and sys.argv[1] == "github"):
+    exit()
+
 keep_alive()
 
 token = os.environ['DISCORD_BOT_SECRET']
 bot.run(token)
-
-if (len(sys.argv) > 1 and sys.argv[1] == "github"):
-    exit()
