@@ -1,4 +1,5 @@
 import os
+import sys
 import random
 import discord
 from discord.ext import commands
@@ -458,3 +459,6 @@ keep_alive()
 
 token = os.environ['DISCORD_BOT_SECRET']
 bot.run(token)
+
+if (len(sys.argv) > 1 and sys.argv[1] == "github"):
+    exit()
