@@ -428,15 +428,48 @@ async def help(ctx):
 
 @bot.hybrid_command(name = "idea", description = "creates an idea vote")
 async def idea(ctx, suggestion: str, suggestion_descriptor: str):
-  embed = discord.Embed(title=f"{suggestion}",
-                        description = f"{suggestion_descriptor}",
-                        color = 0xff641c)
+  if ("ideas" not in jobs):
+    jobs["ideas"] = {}
+      
+  idea_id = None
+  while idea_id is None:
+    idea_id = f"{random.randint(0, 9)}{random.randint(0, 9)}{random.randint(0, 9)}"
 
-  embed.set_footer(text = "React to vote")
+    if idea_id in jobs["ideas"]:
+       idea_id = None
+            
+  embed = discord.Embed(title = suggestion,
+                        description = suggestion_descriptor,
+                        color = 0xff641c)
+  
+  embed.set_footer(text = f"React to vote | id {idea_id}")
 
   message = await ctx.send(embed = embed)
   await message.add_reaction("\U00002705")
   await message.add_reaction("\U0000274C")
+
+  jobs["ideas"][idea_id] = {}
+  jobs["ideas"][idea_id]["title"] = suggestion
+  jobs["ideas"][idea_id]["description"] = suggestion
+
+  dumpJobs()
+
+@bot.hybrid_command(name = "accept", description = "Used by a Team Leader to accept an idea")
+@commands.has_permissions(administrator = True)
+async def accept(ctx, idea_id, channel : discord.abc.GuildChannel):
+    if ("ideas" not in jobs or idea_id not in jobs["ideas"]):
+        await ctx.send(f"Job with id {idea_id} not found")
+        return
+
+    embed = discord.Embed(title = f"{jobs['ideas'][idea_id]['title']}",
+        description = f"{jobs['ideas'][idea_id]['description']}",
+        color = 0xff641c)
+
+    del jobs["ideas"][idea_id]
+    dumpJobs()
+    
+    await channel.send(embed = embed)
+    await ctx.send(f"Idea {idea_id} accepted")
 
 @bot.hybrid_command(name = "announce", description = "announces something")
 async def announce(ctx, message: str, image_link: str):
